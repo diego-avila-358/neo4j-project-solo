@@ -9,18 +9,53 @@
   </head>
   <body>
     <svg></svg>
-    <select id="cypher-query">
-      <option
-        value="MATCH (m:Movie)-[r:IN_GENRE]->(g:Genre {name: 'Sport'}) RETURN m,r,g LIMIT 50"
-      >
-        Sport Movies
-      </option>
+    <div id="controls">
+      <select id="query-type">
+        <option value="genre">Movies by Genre</option>
+        <option value="actor">Movies by Actor</option>
+        <option value="director">Movies by Director</option>
+        <option value="writer">Movies by Writer</option>
+        <option value="all">All Relationships</option>
+      </select>
 
-      <option value="MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 25">
-        All relationships
-      </option>
-    </select>
+      <input id="query-value" placeholder="Drama, Tom Hanks, etc." />
 
-    <input type="button" value="Run Query" id="query-btn" />
+      <input type="hidden" id="cypher-query" />
+
+      <input type="button" value="Run Query" id="query-btn" />
+    </div>
   </body>
 </html>
+
+<script>
+  const queryType = document.getElementById("query-type");
+  const queryValue = document.getElementById("query-value");
+  const cypherQuery = document.getElementById("cypher-query");
+
+  function buildQuery() {
+    const type = queryType.value;
+    const value = queryValue.value.trim();
+
+    if (type === "genre") {
+      cypherQuery.value =
+        `MATCH (m:Movie)-[r:IN_GENRE]->(g:Genre {name: '${value}'}) RETURN m,r,g LIMIT 50`;
+    } else if (type === "actor") {
+      cypherQuery.value =
+        `MATCH (p:Person)-[r:ACTED_IN]->(m:Movie) WHERE p.name CONTAINS '${value}' RETURN p,r,m LIMIT 50`;
+    } else if (type === "director") {
+      cypherQuery.value =
+        `MATCH (p:Person)-[r:DIRECTED]->(m:Movie) WHERE p.name CONTAINS '${value}' RETURN p,r,m LIMIT 50`;
+    } else if (type === "writer") {
+      cypherQuery.value =
+        `MATCH (p:Person)-[r:WROTE]->(m:Movie) WHERE p.name CONTAINS '${value}' RETURN p,r,m LIMIT 50`;
+    } else {
+      cypherQuery.value =
+        `MATCH (n)-[r]->(m) RETURN n,r,m LIMIT 50`;
+    }
+  }
+
+  queryType.addEventListener("change", buildQuery);
+  queryValue.addEventListener("input", buildQuery);
+
+  buildQuery();
+</script>

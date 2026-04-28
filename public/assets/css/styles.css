@@ -1,34 +1,56 @@
-body { 
-  margin: 0; 
-  overflow: hidden; 
+body {
+  margin: 0;
+  overflow: hidden;
 }
-svg { 
-  width: 100vw; 
-  height: 100vh; 
+svg {
+  width: 100vw;
+  height: 100vh;
   display: block;
 }
-circle { 
-  stroke: #fff; 
+circle {
+  stroke: #fff;
   stroke-width: 1.5px;
 }
-line { 
-  stroke: #999; 
-  stroke-opacity: 0.6; 
+line {
+  stroke: gray;
+  stroke-opacity: 0.6;
 }
+
+line[type="ACTED_IN"] {
+  stroke: blue;
+}
+
+line[type="DIRECTED"] {
+  stroke: green;
+}
+
+line[type="WROTE"] {
+  stroke: orange;
+}
+
+
+line.IN_GENRE {
+  stroke: purple;
+}
+
 text {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family:
+    "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", "Lucida Sans",
+    Arial, sans-serif;
   font-size: 1rem;
 }
-input {
+#controls {
   position: fixed;
   top: 0;
-  padding: .5em;
+  left: 0;
+  padding: 5px;
 }
+
 select#cypher-query {
   position: fixed;
   top: 0;
   left: 0;
-  width: calc( 100vw - 100px );
+  width: calc(100vw - 100px);
 }
 input#query-btn {
   right: 0;
@@ -38,12 +60,12 @@ input#query-btn {
 /*
   Update these styles to fit your data
 */
-.Animal {
+.Movie {
   fill: red;
 }
-.Food {
-  fill: blue;
+.Person {
+  fill: yellow;
 }
-.Animal.Food {
-  fill: purple;
+.Genre {
+  fill: cyan;
 }

@@ -21,6 +21,7 @@ document.querySelector( `#query-btn` ).addEventListener( `click`, () => {
         .selectAll( `line` )
         .data( data.links )
         .join( `line` )
+        .attr( `class`, d => d.type )
         .attr( `stroke-width`, 2 );
 
       // Create nodes (vertices)
@@ -28,8 +29,17 @@ document.querySelector( `#query-btn` ).addEventListener( `click`, () => {
         .selectAll( `circle` )
         .data( data.nodes )
         .join( `circle` )
-        .attr( `r`, 20 )
+        .attr( `r`, d =>{
+          // Attempt to size node by links to node
+          const conn = data.links.filter(
+            l => l.source == d.id || l.target == d.id).length;
+            //cap at 20 connections so it doesn't get too large
+            return Math.max(10, Math.min(30, conn));
+        } )
         .attr('class', d => d.label )
+        .on("click", (event, d) => {
+          alert(JSON.stringify(d.properties, null , 2))
+        })
         .call( drag( simulation ) );
 
       // Add labels to nodes
@@ -37,7 +47,7 @@ document.querySelector( `#query-btn` ).addEventListener( `click`, () => {
         .selectAll( `text` )
         .data( data.nodes )
         .join( `text` )
-        .text( d => d.properties.name || d.label )
+        .text( d => d.properties.title || d.properties.name || d.label)
         .attr( `dx`, 25 )
         .attr( `dy`, `.35em` );
 
