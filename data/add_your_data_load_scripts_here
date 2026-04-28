@@ -1,0 +1,87 @@
+//Constraints
+
+CREATE CONSTRAINT movie_id
+FOR (m:Movie) 
+REQUIRE m.tconst IS UNIQUE;
+
+CREATE CONSTRAINT person_id
+FOR (p:Person) 
+REQUIRE p.nconst IS UNIQUE;
+
+CREATE CONSTRAINT genre_name
+FOR (g:Genre) 
+REQUIRE g.name IS UNIQUE;
+
+//Load all of the nodes first
+
+// Load in data with call row in transactions because too much data
+LOAD CSV WITH HEADERS FROM 'file:///title.csv' AS row
+CALL (row) {
+CREATE (:Movie {
+  tconst: row.tconst,
+  title: row.primaryTitle,
+  originalTitle: row.originalTitle,
+  isAdult: row.isAdult,
+  startYear: toInteger(row.startYear),
+  endYear: toInteger(row.endYear),
+  runtime: toInteger(row.runtimeMinutes),
+  rating: toFloat(row.averageRating),
+  votes: toInteger(row.numVotes)
+})
+} IN TRANSACTIONS OF 10000 ROWS
+
+
+// Load all of the people
+LOAD CSV WITH HEADERS FROM 'file:///people.csv' AS row
+CALL (row) {
+CREATE (:Person {
+  nconst: row.nconst,
+  name: row.primaryName,
+  birthYear: toInteger(row.birthYear),
+  deathYear: toInteger(row.deathYear)
+})
+} IN TRANSACTIONS OF 10000 ROWS;
+
+
+//load genres
+LOAD CSV WITH HEADERS FROM 'file:///genres.csv' AS row
+CREATE (:Genre {
+  name: row.genre
+});
+
+
+//Now load relationships
+
+// Start with titles -> 
+LOAD CSV WITH HEADERS FROM 'file:///title_genres.csv' AS row
+CALL (row) {
+MATCH (m:Movie {tconst: row.tconst})
+MATCH (g:Genre {name: row.genre})
+CREATE (m)-[:IN_GENRE]->(g)
+
+} IN TRANSACTIONS OF 10000 ROWS;
+
+
+// Now load act_in 
+LOAD CSV WITH HEADERS FROM 'file:///acted_in.csv' AS row
+CALL (row) {
+MATCH (p:Person {nconst: row.nconst})
+MATCH (m:Movie {tconst: row.tconst})
+CREATE (p)-[:ACTED_IN]->(m)
+} IN TRANSACTIONS OF 10000 ROWS;
+
+//Load the directed movies relationshio
+LOAD CSV WITH HEADERS FROM 'file:///directed.csv' AS row
+CALL (row) {
+MATCH (p:Person {nconst: row.nconst})
+MATCH (m:Movie {tconst: row.tconst})
+CREATE (p)-[:DIRECTED]->(m)
+}IN TRANSACTIONS OF 10000 ROWS;
+
+//Load wrote movies
+LOAD CSV WITH HEADERS FROM 'file:///wrote.csv' AS row
+CALL (row){
+MATCH (p:Person {nconst: row.nconst})
+MATCH (m:Movie {tconst: row.tconst})
+CREATE (p)-[:WROTE]->(m)
+} IN TRANSACTIONS OF 10000 ROWS;

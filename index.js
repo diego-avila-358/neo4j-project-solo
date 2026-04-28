@@ -13,10 +13,10 @@ const port = 3000;
 // Connect to Neo4j
 const driver = neo4j.driver(
   `bolt://localhost:7687`,
-  neo4j.auth.basic( `neo4j`, `student1` )
+  neo4j.auth.basic( `neo4j`, `finalProject042726` )
 );
 // Update with your Neo4j database name:
-const session = driver.session( { database: `animals` } ); 
+const session = driver.session( { database: `neo4j` } ); 
 
 app.use( express.static( `public` ) );
 
